@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Profile</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: sticky identity sidebar on the left, a README-led overview with pinned work and a contribution map on the right; stacks to one column on phones. */
+:root {
+  --bg: #F4F6FA;
+  --surface: #FFFFFF;
+  --line: #DCE1EA;
+  --fg: #141B2B;
+  --muted: #5B667A;
+  --accent: #4A57E8;
+  --accent-soft: #E9EBFF;
+  --g0: #E6EAF1;
+  --g1: #B9E7CB;
+  --g2: #6FCB97;
+  --g3: #2FA66B;
+  --g4: #17704A;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C111C;
+    --surface: #131A29;
+    --line: #242E42;
+    --fg: #E7ECF5;
+    --muted: #8C98AE;
+    --accent: #8C96FF;
+    --accent-soft: #1D2347;
+    --g0: #1A2234;
+    --g1: #14452F;
+    --g2: #1B7A4D;
+    --g3: #2FA66B;
+    --g4: #6EE2A3;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C111C;
+  --surface: #131A29;
+  --line: #242E42;
+  --fg: #E7ECF5;
+  --muted: #8C98AE;
+  --accent: #8C96FF;
+  --accent-soft: #1D2347;
+  --g0: #1A2234;
+  --g1: #14452F;
+  --g2: #1B7A4D;
+  --g3: #2FA66B;
+  --g4: #6EE2A3;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* top bar */
+.top { border-bottom: 1px solid var(--line); background: var(--surface); }
+.top .wrap { display: flex; align-items: center; gap: 20px; padding-block: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
+.brand svg { width: 28px; height: 28px; }
+.nav { display: flex; gap: 4px; margin-left: auto; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+.nav a { padding: 6px 10px; border-radius: 8px; }
+.nav a:hover { background: var(--bg); color: var(--fg); }
+.nav a[aria-current] { color: var(--fg); font-weight: 600; background: var(--bg); }
+
+/* page grid */
+.page { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 40px; padding-block: 36px 64px; align-items: start; }
+.side { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+
+/* identity */
+.avatar { width: 100%; max-width: 260px; aspect-ratio: 1; border-radius: 50%; display: block; border: 1px solid var(--line); }
+.name { font-family: var(--font-display); font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; margin: 0; font-weight: 700; }
+.handle { font-family: var(--font-mono); color: var(--muted); font-size: 14px; margin-top: 4px; }
+.bio { margin: 0; color: var(--fg); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; border: 1px solid var(--line); background: var(--surface); }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); flex: 1; }
+.btn.primary:hover { filter: brightness(1.08); }
+.counts { display: flex; gap: 6px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.counts b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.meta { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--muted); }
+.meta li { display: flex; gap: 10px; align-items: center; min-width: 0; overflow-wrap: anywhere; }
+.meta svg { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.meta a:hover { color: var(--accent); }
+.label { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.badges { display: flex; gap: 10px; flex-wrap: wrap; }
+.badge { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #fff; position: relative; }
+.badge small { position: absolute; right: -4px; bottom: -4px; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; font: 600 10px var(--font-mono); padding: 0 5px; }
+.orgs { display: flex; gap: 8px; }
+.org { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; font: 700 13px var(--font-display); color: #fff; }
+
+/* cards */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.card-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--font-mono); font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.card-h b { color: var(--fg); font-weight: 500; }
+
+/* README */
+.readme-body { padding: 30px 28px 32px; display: flex; flex-direction: column; gap: 18px; }
+.hello { font-family: var(--font-mono); font-size: 13px; color: var(--accent); margin: 0; }
+.headline { font-family: var(--font-display); font-weight: 700; font-size: clamp(34px, 6vw, 58px); line-height: 1.02; letter-spacing: -0.035em; margin: 0; text-wrap: balance; }
+.headline em { font-style: normal; background: linear-gradient(transparent 62%, var(--g2) 62%, var(--g2) 92%, transparent 92%); }
+.lede { max-width: 62ch; color: var(--muted); margin: 0; font-size: 16px; }
+.now { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 6px; }
+.now div { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+.now span { display: block; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.stack { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font-family: var(--font-mono); font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+
+/* section titles */
+.sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 0 12px; }
+.sec-h h2 { font-family: var(--font-display); font-size: 19px; letter-spacing: -0.01em; margin: 0; }
+.sec-h a { font-size: 13px; color: var(--accent); }
+
+/* pinned */
+.pins { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.pin { padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; transition: border-color .15s, transform .15s; }
+.pin:hover { border-color: var(--accent); transform: translateY(-2px); }
+.pin-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pin-name { font-family: var(--font-mono); font-weight: 500; font-size: 14px; color: var(--accent); overflow-wrap: anywhere; }
+.tag { font-size: 11.5px; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 1px 8px; flex: none; }
+.pin p { margin: 0; color: var(--muted); font-size: 14px; flex: 1; }
+.pin-foot { display: flex; gap: 16px; font-size: 13px; color: var(--muted); align-items: center; flex-wrap: wrap; }
+.dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: -1px; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* contributions */
+.contrib { padding: 18px 18px 14px; }
+.contrib-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.contrib-top h3 { margin: 0; font-family: var(--font-display); font-size: 17px; font-weight: 600; }
+.contrib-top h3 b { font-variant-numeric: tabular-nums; }
+.sample { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.scroll { overflow-x: auto; padding-bottom: 8px; }
+.graph { display: grid; grid-template-columns: 28px repeat(53, 12px); grid-template-rows: 16px repeat(7, 12px); gap: 3px; width: max-content; }
+.mo { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); grid-row: 1; white-space: nowrap; }
+.dl { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); grid-column: 1; line-height: 12px; }
+.cell { width: 12px; height: 12px; border-radius: 3px; background: var(--g0); }
+.cell[data-l="1"] { background: var(--g1); }
+.cell[data-l="2"] { background: var(--g2); }
+.cell[data-l="3"] { background: var(--g3); }
+.cell[data-l="4"] { background: var(--g4); }
+.cell:hover { outline: 1.5px solid var(--fg); outline-offset: 1px; }
+.legend { display: flex; align-items: center; gap: 4px; justify-content: flex-end; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.legend .cell { width: 11px; height: 11px; }
+.legend span { margin: 0 4px; }
+
+/* languages + activity */
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; }
+.panel { padding: 18px; min-width: 0; }
+.langbar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; gap: 2px; margin-bottom: 14px; }
+.langbar i { display: block; height: 100%; }
+.langs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; font-size: 14px; }
+.langs li { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.langs .pct { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+.feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; font-size: 14px; }
+.feed li { display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 12px; }
+.feed .pip { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; background: var(--g3); }
+.feed .pip.pr { background: var(--accent); }
+.feed .pip.rv { background: var(--muted); }
+.feed time { display: block; font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.feed b { font-family: var(--font-mono); font-weight: 500; color: var(--accent); overflow-wrap: anywhere; }
+
+footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+footer .wrap { padding-block: 20px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 880px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 24px; }
+  .side { position: static; }
+  .head { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: center; }
+  .avatar { max-width: 96px; }
+  .nav { margin-left: 0; width: 100%; }
+  .readme-body { padding: 22px 18px 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .pin { transition: none; } .pin:hover { transform: none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#overview" aria-label="Profile home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" style="fill:var(--fg)"/><path d="M9 21l5-10 4 7 2-3 3 6" style="fill:none;stroke:var(--bg);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"/></svg>
+      <span>Open Profile</span>
+    </a>
+    <nav class="nav" aria-label="Profile sections">
+      <a href="#overview" aria-current="page">Overview</a>
+      <a href="#repos">Repositories</a>
+      <a href="#contributions">Contributions</a>
+      <a href="#activity">Activity</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="page">
+
+    <aside class="side">
+      <div class="head" style="display:contents">
+        <svg class="avatar" viewBox="0 0 200 200" role="img" aria-label="Profile avatar with initials YN">
+          <defs>
+            <linearGradient id="avg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#4A57E8"/>
+              <stop offset="1" stop-color="#2FA66B"/>
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="100" fill="url(#avg)"/>
+          <g fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2">
+            <circle cx="100" cy="100" r="78"/><circle cx="100" cy="100" r="56"/><circle cx="100" cy="100" r="34"/>
+          </g>
+          <text x="100" y="118" text-anchor="middle" font-family="Space Grotesk, Inter, sans-serif" font-weight="700" font-size="64" fill="#fff">YN</text>
+        </svg>
+        <div>
+          <h1 class="name">Your Name</h1>
+          <div class="handle">@username</div>
+        </div>
+      </div>
+
+      <p class="bio">Software engineer building developer tools in the open. Small PRs, clear docs, friendly reviews.</p>
+
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/">Follow</a>
+        <a class="btn" href="https://github.com/sponsors">Sponsor</a>
+      </div>
+
+      <div class="counts"><span><b>2.4k</b> followers</span><span>·</span><span><b>138</b> following</span></div>
+
+      <ul class="meta">
+        <li><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>Open source collective</li>
+        <li><svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>Planet Earth, UTC+5:30</li>
+        <li><svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg><a href="https://example.com">example.com</a></li>
+        <li><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>hello@example.com</li>
+      </ul>
+
+      <div>
+        <p class="label">Achievements</p>
+        <div class="badges">
+          <span class="badge" style="background:linear-gradient(135deg,#4A57E8,#7C86FF)" title="Pull Shark">PS<small>x4</small></span>
+          <span class="badge" style="background:linear-gradient(135deg,#1F9D63,#6FCB97)" title="Quickdraw">QD</span>
+          <span class="badge" style="background:linear-gradient(135deg,#E0892B,#F2C46B)" title="Starstruck">SS<small>x2</small></span>
+          <span class="badge" style="background:linear-gradient(135deg,#C2417A,#F08BB4)" title="Galaxy Brain">GB</span>
+        </div>
+      </div>
+
+      <div>
+        <p class="label">Organizations</p>
+        <div class="orgs">
+          <span class="org" style="background:#4A57E8" title="open-tools">OT</span>
+          <span class="org" style="background:#1F9D63" title="docs-guild">DG</span>
+          <span class="org" style="background:#C2417A" title="lint-labs">LL</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main" id="overview">
+
+      <section class="card">
+        <div class="card-h"><span><b>username</b> / README.md</span><span>public</span></div>
+        <div class="readme-body">
+          <p class="hello">$ whoami</p>
+          <h2 class="headline">Building <em>in the open</em>, one pull request at a time.</h2>
+          <p class="lede">I write tools that make other developers faster: command-line utilities, build plugins and the docs that explain them. Everything here is MIT licensed and open to contributions. If something is confusing, that is a bug in my docs, so please open an issue.</p>
+          <div class="now">
+            <div><span>Working on</span>A zero-config bundler for small libraries</div>
+            <div><span>Learning</span>Rust for fast CLI tooling</div>
+            <div><span>Ask me about</span>Developer experience, TypeScript, testing</div>
+          </div>
+          <div class="stack" aria-label="Tech stack">
+            <span class="chip">TypeScript</span><span class="chip">Rust</span><span class="chip">Python</span><span class="chip">Node.js</span><span class="chip">PostgreSQL</span><span class="chip">Docker</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="repos">
+        <div class="sec-h"><h2>Pinned</h2><a href="https://github.com/?tab=repositories">All repositories</a></div>
+        <div class="pins" id="pins"></div>
+      </section>
+
+      <section id="contributions">
+        <div class="sec-h"><h2>Contributions</h2></div>
+        <div class="card contrib">
+          <div class="contrib-top">
+            <h3><b id="total">0</b> contributions in the last year</h3>
+            <span class="sample">sample data, replace with your own</span>
+          </div>
+          <div class="scroll"><div class="graph" id="graph" role="img" aria-label="Contribution graph for the last 12 months"></div></div>
+          <div class="legend">Less <span></span>
+            <i class="cell" data-l="0"></i><i class="cell" data-l="1"></i><i class="cell" data-l="2"></i><i class="cell" data-l="3"></i><i class="cell" data-l="4"></i>
+            <span></span> More</div>
+        </div>
+      </section>
+
+      <section id="activity" class="two">
+        <div class="card panel">
+          <p class="label">Top languages</p>
+          <div class="langbar" id="langbar"></div>
+          <ul class="langs" id="langs"></ul>
+        </div>
+        <div class="card panel">
+          <p class="label">Recent activity</p>
+          <ul class="feed">
+            <li><i class="pip pr"></i><div>Opened a pull request in <b>open-tools/forge</b><time>2 hours ago</time></div></li>
+            <li><i class="pip"></i><div>Pushed 4 commits to <b>username/tinybundle</b><time>Yesterday</time></div></li>
+            <li><i class="pip rv"></i><div>Reviewed 3 pull requests in <b>docs-guild/handbook</b><time>3 days ago</time></div></li>
+            <li><i class="pip"></i><div>Released <b>quietlint v2.4.0</b><time>Last week</time></div></li>
+          </ul>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer><div class="wrap"><span>Replace the sample text, repos and numbers with your own.</span><span>Last updated Nov 2026</span></div></footer>
+
+<script>
+(function () {
+  var repos = [
+    { n: "tinybundle", d: "A zero-config bundler for small libraries. Ships ESM and CJS from one source file.", l: "TypeScript", c: "#3B82F6", s: 4210, f: 188, t: "Public" },
+    { n: "quietlint", d: "Linter that reports only what matters. Fast, opinionated and easy to configure.", l: "Rust", c: "#E0892B", s: 2874, f: 96, t: "Public" },
+    { n: "handbook", d: "The contributor handbook for open-tools: setup, review etiquette and release flow.", l: "Markdown", c: "#6B7A90", s: 1342, f: 311, t: "Public" },
+    { n: "pgdiff", d: "Compare two PostgreSQL schemas and generate a safe migration plan.", l: "Python", c: "#2FA66B", s: 986, f: 54, t: "Public" },
+    { n: "shipnote", d: "Turn merged pull requests into readable release notes with one command.", l: "TypeScript", c: "#3B82F6", s: 751, f: 41, t: "Public" },
+    { n: "dotfiles", d: "Shell, editor and terminal setup that gets a new laptop productive in ten minutes.", l: "Shell", c: "#C2417A", s: 312, f: 27, t: "Public" }
+  ];
+  var pins = document.getElementById("pins");
+  function fmt(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + "k" : String(n); }
+  repos.forEach(function (r) {
+    var a = document.createElement("a");
+    a.className = "card pin";
+    a.href = "https://github.com/";
+    a.innerHTML =
+      '<div class="pin-top"><span class="pin-name">' + r.n + '</span><span class="tag">' + r.t + '</span></div>' +
+      '<p>' + r.d + '</p>' +
+      '<div class="pin-foot"><span><i class="dot" style="background:' + r.c + '"></i>' + r.l + '</span>' +
+      '<span class="num">&#9733; ' + fmt(r.s) + '</span><span class="num">&#8918; ' + fmt(r.f) + '</span></div>';
+    pins.appendChild(a);
+  });
+
+  // languages
+  var langs = [
+    ["TypeScript", 46, "#3B82F6"], ["Rust", 22, "#E0892B"], ["Python", 14, "#2FA66B"],
+    ["Shell", 8, "#C2417A"], ["Markdown", 6, "#6B7A90"], ["Other", 4, "#A0AEC0"]
+  ];
+  var bar = document.getElementById("langbar"), list = document.getElementById("langs");
+  langs.forEach(function (x) {
+    var i = document.createElement("i");
+    i.style.width = x[1] + "%"; i.style.background = x[2]; i.title = x[0] + " " + x[1] + "%";
+    bar.appendChild(i);
+    var li = document.createElement("li");
+    li.innerHTML = '<span><i class="dot" style="background:' + x[2] + '"></i>' + x[0] + '</span><span class="pct">' + x[1] + '%</span>';
+    list.appendChild(li);
+  });
+
+  // contribution graph (seeded sample data)
+  var seed = 20261120;
+  function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+  var end = new Date(); end.setHours(0, 0, 0, 0);
+  var start = new Date(end); start.setDate(start.getDate() - (52 * 7 + end.getDay()));
+  var graph = document.getElementById("graph");
+  var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var dayNames = { 1: "Mon", 3: "Wed", 5: "Fri" };
+  Object.keys(dayNames).forEach(function (d) {
+    var el = document.createElement("span");
+    el.className = "dl"; el.textContent = dayNames[d]; el.style.gridRow = (Number(d) + 2);
+    graph.appendChild(el);
+  });
+  var total = 0, lastMonth = -1;
+  for (var w = 0; w < 53; w++) {
+    for (var d = 0; d < 7; d++) {
+      var day = new Date(start); day.setDate(start.getDate() + w * 7 + d);
+      if (day > end) continue;
+      if (d === 0 && day.getMonth() !== lastMonth) {
+        lastMonth = day.getMonth();
+        var m = document.createElement("span");
+        m.className = "mo"; m.textContent = months[lastMonth]; m.style.gridColumn = (w + 2);
+        graph.appendChild(m);
+      }
+      var weekend = d === 0 || d === 6;
+      var burst = Math.sin(w / 5.5) * 0.5 + 0.5;
+      var v = rnd() * (weekend ? 0.55 : 1.15) * (0.45 + burst);
+      var count = v < 0.34 ? 0 : Math.round(v * 9);
+      var level = count === 0 ? 0 : count < 3 ? 1 : count < 5 ? 2 : count < 8 ? 3 : 4;
+      total += count;
+      var c = document.createElement("i");
+      c.className = "cell"; c.dataset.l = level;
+      c.style.gridColumn = (w + 2); c.style.gridRow = (d + 2);
+      c.title = count + " contribution" + (count === 1 ? "" : "s") + " on " + months[day.getMonth()] + " " + day.getDate() + ", " + day.getFullYear();
+      graph.appendChild(c);
+    }
+  }
+  document.getElementById("total").textContent = total.toLocaleString("en-US");
+})();
+</script>
+</body>
+</html>
